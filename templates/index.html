@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Word Highlighter</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    
+    <style>
+        body {
+            padding: 20px;
+        }
+
+        h1, h2, h3, h4 {
+            margin-bottom: 20px;
+        }
+
+        form {
+            margin-bottom: 30px;
+        }
+
+        label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .result-container {
+            margin-top: 30px;
+        }
+
+        .highlighted-text-container {
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin-top: 20px;
+            background-color: #f8f9fa;
+        }
+
+        .download-link {
+            display: block;
+            margin-top: 10px;
+            color: #007bff;
+        }
+
+        .download-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="mt-5">PDF Word Highlighter</h1>
+
+        <form method="post" action="/" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="pdf_file">Select PDF File:</label>
+                <input type="file" class="form-control-file" name="pdf_file" accept=".pdf" required>
+            </div>
+
+            <div class="form-group">
+                <label for="highlight_file">Upload Text File with Highlighted Words:</label>
+                <input type="file" class="form-control-file" name="highlight_file" accept=".txt" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Process File</button>
+        </form>
+
+        {% if error_message %}
+            <p class="text-danger">{{ error_message }}</p>
+        {% endif %}
+
+        <div class="result-container">
+            {% if results %}
+                {% for result in results %}
+                    <h2>Result:</h2>
+                    <h3>{{ result['file_name'] }}</h3>
+
+                    {% if result['word_occurrences'] %}
+                        <p>Word occurrences:</p>
+                        <ul>
+                            {% for word, count in result['word_occurrences'].items() %}
+                                <li>{{ word }}: {{ count }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p>No matching words found.</p>
+                    {% endif %}
+
+                    {% if result['highlighted_text'] %}
+                        <h4>Highlighted Text:</h4>
+                        <div class="highlighted-text-container">
+                            {{ result['highlighted_text']|safe }}
+
+                            {# Add a link to download the highlighted text as an HTML file #}
+                            <a href="/download_html?file={{ result['file_name'] }}" class="download-link" download>
+                                Download Highlighted Text as HTML
+                            </a>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and dependencies (optional) -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
